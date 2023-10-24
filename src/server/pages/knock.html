@@ -1,0 +1,68 @@
+<script src="/socket.io/socket.io.js"></script>
+<script>
+    const socket = io();
+    let hasKnocked = false;
+    let uniqueId = 0;
+    // socket.on('connect', () => {
+    //     console.log('connected, i am', socket.id);
+    // });
+    socket.on('knock', () => {
+        // console.log('knock received');
+        addKnockElement();
+    });
+    const knock = () => {
+        // console.log('knocking');
+        if (!hasKnocked) {
+            hasKnocked = true;
+            document.querySelector('#message').style.display = 'none';
+        }
+        socket.emit('knock');
+    }
+    const addKnockElement = () => {
+        const uniqueKnockId = `knock-${uniqueId++}`;
+        const knocks = document.getElementById('knocks');
+        const newKnock = document.createElement('div');
+        newKnock.className = 'knock';
+        newKnock.id = uniqueKnockId;
+        knocks.appendChild(newKnock);
+        const fadeInterval = setInterval(function () {
+            const fadingKnock = document.querySelector(`#${uniqueKnockId}`);
+            const currentOpacity = window.getComputedStyle(fadingKnock).getPropertyValue("opacity");
+            const newOpacity = parseFloat(currentOpacity) - 0.02;
+            if (newOpacity <= 0) {
+                clearInterval(fadeInterval);
+                knocks.removeChild(fadingKnock);
+            } else {
+                fadingKnock.style.opacity = newOpacity;
+            }
+        }, 10);
+        uniqueId++;
+    }
+    window.socket = socket;
+</script>
+<script>
+    document.addEventListener('click', (e) => {
+        knock()
+    })
+</script>
+<style>
+    body { height: 100%; }
+    .knock {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: transparent;
+        font-size: 64px;
+        opacity : 1;   
+    }
+    .knock::before {
+        content: "knock";
+    }
+</style>
+<body>
+    <div id="message">click to knock</div>
+    <div id="knocks"></div>
+</body>
