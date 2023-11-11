@@ -1,15 +1,23 @@
+const PORT = 3000;
+const URL_PREFIX = '/knock';
+
 const express = require('express');
 const app = express();
+const router = express.Router();
 const http = require('http');
 const server = http.createServer(app);
 const { Server } = require("socket.io");
-const io = new Server(server);
+const io = new Server(server, {
+    path: `${URL_PREFIX}/socket.io/`
+});
+
+app.use(`${URL_PREFIX}`, router)
 
 // we serve up the client page, and client socket.io library
-app.get('/', (req, res) => {
+router.get('/', (req, res) => {
     res.sendFile(__dirname + '/pages/knock.html');
 });
-app.get('/socket.io/socket.io.js', (req, res) => {
+router.get('/socket.io/socket.io.js', (req, res) => {
     res.sendFile(__dirname + '/node_modules/socket.io/client-dist/socket.io.js')
 });
 
@@ -94,6 +102,6 @@ io.on('connection', (socket) => {
 });
 
 // start the server listening for connections
-server.listen(3000, () => {
-    console.log('listening on *:3000');
+server.listen(PORT, () => {
+    console.log(`listening on *:${PORT}`);
 });

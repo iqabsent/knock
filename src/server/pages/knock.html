@@ -1,6 +1,8 @@
-<script src="/socket.io/socket.io.js"></script>
+<script src="/knock/socket.io/socket.io.js"></script>
 <script>
-    const socket = io();
+    const socket = io(window.location.host, {
+        path: "/knock/socket.io"
+    });
     let hasKnocked = false;
     let uniqueId = 0;
     // socket.on('connect', () => {
